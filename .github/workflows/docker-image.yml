@@ -22,7 +22,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-            images: manishdark/cloud
+            images: manishvashishtha/cloud
             tags: |
               type=raw,value=latest
               type=raw,value={{date 'YYYYMMDD-HHmmss'}}
