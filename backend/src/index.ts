@@ -36,9 +36,7 @@ mongoose.connect(MONGO_URI)
     console.error("MongoDB connection error:", err);
   });
 
-app.get('/', (req, res) => {
-  res.send('Manish-Dark API is running');
-});
+// API root check removed to serve frontend
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
@@ -48,3 +46,11 @@ app.use('/api/folders', folderRoutes);
 app.use('/api/storages', storageRoutes);
 app.use('/api/access', accessRoutes);
 app.use('/api/workers', workerRoutes);
+
+import path from 'path';
+const frontendPath = path.join(__dirname, '../public');
+app.use(express.static(frontendPath));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});

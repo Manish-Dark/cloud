@@ -22,7 +22,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-            images: thedominux/pentaract
+            images: manishdark/cloud
             tags: |
               type=raw,value=latest
               type=raw,value={{date 'YYYYMMDD-HHmmss'}}
