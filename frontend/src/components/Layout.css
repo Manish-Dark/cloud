@@ -1,0 +1,22 @@
+/* Layout Background Floating Orbs */
+.layout-orb {
+  animation: orbPulse ease-in-out infinite;
+}
+
+@keyframes orbPulse {
+  0%   { transform: scale(1) translate(0, 0); }
+  33%  { transform: scale(1.08) translate(10px, -15px); }
+  66%  { transform: scale(0.94) translate(-8px, 10px); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+
+/* Floating icons in background */
+.layout-float-icon {
+  animation: iconFloat ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%   { transform: translateY(0px) rotate(0deg); }
+  50%  { transform: translateY(-18px) rotate(6deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}

@@ -1,0 +1,64 @@
+/* Login Page - Animated Background */
+
+.login-bg {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 24px;
+  background: linear-gradient(135deg,
+    #0f0c29 0%,
+    #1a0533 20%,
+    #0d1b4b 40%,
+    #0a2e4a 60%,
+    #0e2d3d 80%,
+    #051937 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Floating colourful bubbles */
+.bubble {
+  position: absolute;
+  bottom: -150px;
+  border-radius: 50%;
+  animation: riseUp linear infinite;
+  opacity: 0;
+}
+
+/* Give each bubble a different vibrant gradient */
+.bubble:nth-child(1)  { background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.6), rgba(99,102,241,0.1)); }
+.bubble:nth-child(2)  { background: radial-gradient(circle at 30% 30%, rgba(236,72,153,0.5), rgba(236,72,153,0.1)); }
+.bubble:nth-child(3)  { background: radial-gradient(circle at 30% 30%, rgba(16,185,129,0.5), rgba(16,185,129,0.1)); }
+.bubble:nth-child(4)  { background: radial-gradient(circle at 30% 30%, rgba(245,158,11,0.5), rgba(245,158,11,0.1)); }
+.bubble:nth-child(5)  { background: radial-gradient(circle at 30% 30%, rgba(59,130,246,0.5), rgba(59,130,246,0.1)); }
+.bubble:nth-child(6)  { background: radial-gradient(circle at 30% 30%, rgba(139,92,246,0.6), rgba(139,92,246,0.1)); }
+
+@keyframes riseUp {
+  0%   { transform: translateY(0) scale(1);   opacity: 0;    }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.3; }
+  100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+}
+
+/* Floating tech icons */
+.float-icon {
+  position: absolute;
+  animation: floatUpDown ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes floatUpDown {
+  0%   { transform: translateY(0px) rotate(0deg); }
+  50%  { transform: translateY(-22px) rotate(5deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
