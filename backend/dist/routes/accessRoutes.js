@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const AccessController_1 = require("../controllers/AccessController");
+const router = (0, express_1.Router)();
+router.get('/', AccessController_1.getAccessesByStorage);
+router.post('/', AccessController_1.createAccess);
+router.put('/:id', AccessController_1.updateAccess);
+router.delete('/:id', AccessController_1.deleteAccess);
+exports.default = router;
