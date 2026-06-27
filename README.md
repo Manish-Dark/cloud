@@ -196,4 +196,4 @@ Contributions are welcome! Please feel free to open issues or submit pull reques
 
 ## License
 
-Distributed under the ISC License. See `LICENSE` for more information.
+Distributed under the MIT License. See `LICENSE` for more information.
