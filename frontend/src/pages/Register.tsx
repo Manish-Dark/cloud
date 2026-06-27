@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Container, Box, TextField, Button, Paper, Typography, Divider } from '@mui/material';
-import axios from 'axios';
+import api from '../api';
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -11,7 +11,7 @@ const Register: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/register', { email, password });
+      const response = await api.post('/auth/register', { email, password });
       localStorage.setItem('access_token', response.data.access_token);
       navigate('/');
     } catch (error: any) {

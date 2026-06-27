@@ -10,7 +10,7 @@ import StorageIcon from '@mui/icons-material/Storage';
 import FolderIcon from '@mui/icons-material/Folder';
 import SecurityIcon from '@mui/icons-material/Security';
 import WifiIcon from '@mui/icons-material/Wifi';
-import axios from 'axios';
+import api from '../api';
 import './Login.css';
 
 const Login: React.FC = () => {
@@ -22,7 +22,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login', { email, password });
+      const response = await api.post('/auth/login', { email, password });
       localStorage.setItem('access_token', response.data.access_token);
       navigate('/');
     } catch (error: any) {
