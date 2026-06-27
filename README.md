@@ -1,298 +1,199 @@
-![cloud-github-logo](https://github.com/Manish-Dark/cloud/assets/55978340/db39e76f-4119-41c1-bbfd-9b59f40ab626)
+# Cloud
 
-[<img alt="GitHub Workflow Status (with event)" src="https://img.shields.io/github/actions/workflow/status/Manish-Dark/cloud/docker-image.yml?style=plastic&logo=github">](https://github.com/Manish-Dark/cloud/actions)
-[<img alt="Dockerhub latest" src="https://img.shields.io/badge/dockerhub-latest-blue?logo=docker&style=plastic">](https://hub.docker.com/r/manishdark/cloud)
-[<img alt="Docker Image Size (tag)" src="https://img.shields.io/docker/image-size/manishdark/cloud/latest?style=plastic&logo=docker&color=gold">](https://hub.docker.com/r/manishdark/cloud/tags?page=1&name=latest)
+[<img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Manish-Dark/cloud/docker-image.yml?style=plastic&logo=github">](https://github.com/Manish-Dark/cloud/actions)
+[<img alt="Dockerhub latest" src="https://img.shields.io/badge/dockerhub-latest-blue?logo=docker&style=plastic">](https://hub.docker.com/r/manishvashishtha/cloud)
+[<img alt="Docker Image Size (tag)" src="https://img.shields.io/docker/image-size/manishvashishtha/cloud/latest?style=plastic&logo=docker&color=gold">](https://hub.docker.com/r/manishvashishtha/cloud/tags?page=1&name=latest)
 [<img alt="Any platform" src="https://img.shields.io/badge/platform-any-green?style=plastic&logo=linux&logoColor=white">](https://github.com/Manish-Dark/cloud)
 
-_Cloud storage system based on using Telegram as a storage so it doesn't use your server filesystem or any other paid cloud storage system underneath the hood._
+**Cloud** is a personal cloud storage system that uses **Telegram** as its underlying storage backend. It does not occupy space on your server's filesystem or require paid object storage (like AWS S3 or Google Drive) underneath. Instead, all uploaded files are stored securely as documents in a dedicated Telegram channel via a Telegram Bot.
 
-**BTC**: `18mquj59AcB4y4VBevdn5HekG5y7gvPYGk`
+To bypass Telegram's API file size limits, **Cloud** dynamically splits large files into chunks during upload:
+- **15 MB chunks** for files larger than or equal to 1 GB (to ensure upload stability and prevent timeouts).
+- **25 MB chunks** for files smaller than 1 GB (to reduce network round-trips for standard files).
 
-**TON**: `UQDoGRgUIEDA30cko8k-icnI8S5i8QIq2jFvqswNvVUc9F2U`
+When a user requests a file download, the application automatically fetches all associated chunks from the Telegram API, streams them, and reconstructs the original file on-the-fly.
 
-**USDT TON**: `UQDoGRgUIEDA30cko8k-icnI8S5i8QIq2jFvqswNvVUc9F2U`
+---
 
-https://github.com/Manish-Dark/cloud/assets/55978340/b62305a7-cae3-4e1c-a509-38e415392dcf
+## Features
 
-Cloud is aimed to take as small disk space as possible. So it does not need any code interpreter/platform to run. The whole app is just several megabytes in size. It also uses Postgres as a database and we try our best to economy space by not creating unneeded fields and tables and to wisely pick proper datatypes.
+- **Chunked File Transfer:** Seamlessly upload and download files of almost any size.
+- **Telegram Backend:** Utilize Telegram's free, unlimited storage via standard Bot API calls.
+- **Storage & Access Management:** Create individual virtual storages, organize files into folders, and manage multi-user access control.
+- **MongoDB Integration:** All file metadata, storage info, chunk details, and user profiles are stored in MongoDB.
+- **Modern Full-Stack Architecture:**
+  - **Backend:** Node.js, Express, TypeScript, and Mongoose.
+  - **Frontend:** React, Vite, TypeScript, and TailwindCSS (or custom styling).
 
-The platform itself can be used differently, like as a personal (on your own server or a local machine) platform or a platform for many users with multiple storages and so on. Since it provides Rest API, you can also use it as a file system in your backend like [NextCloud](https://nextcloud.com/) or [AWS S3](https://aws.amazon.com/s3/) or S3 compatable services (like [MinIO](https://min.io/)), but for now it's so early so I don't recommend to use it in production ready apps.
+---
 
-# Installation
+## Prerequisites
 
-This project is aimed on running the app in container, so the primary way to run it is via [Docker](https://www.docker.com/). If you don't have it installed or simply don't want to run the app via Docker, you can build it from source.
+Before running the application, make sure you have:
+1. A **Telegram Bot Token** (created via [@BotFather](https://t.me/BotFather)).
+2. A **Telegram Channel** where the bot is added as an administrator with posting rights.
+3. A **Telegram Channel ID** (e.g. `-100xxxxxxxxx`).
+4. A **MongoDB connection URI** (either local MongoDB instance or MongoDB Atlas).
 
-> NOTE: Cloud uses [Postgres](https://www.postgresql.org/) as a database. So if you are going to run it from source or run the Cloud image only, you will need to have a Postgres instance running and available in your network so you will connect your Cloud app to it
+---
 
-<details>
-  <summary>Docker Compose with pre-built image <i>(recommended)</i></summary>
+## Configuration
 
-The simplest way to run and manage the app
+Create a `.env` file in the root directory (or in the `backend/` directory) and populate it with your configuration:
 
-1. Create new directory for the app files and name it however you wish:
+```env
+PORT=8000
+SECRET_KEY=your_super_secret_jwt_key
+SUPERUSER_EMAIL=admin@example.com
+SUPERUSER_PASS=your_admin_password
+ACCESS_TOKEN_EXPIRE_IN_SECS=1800
+REFRESH_TOKEN_EXPIRE_IN_DAYS=14
 
-```sh
-mkdir cloud
+# Telegram Settings
+TELEGRAM_BOT_TOKEN=your_bot_token_here
+TELEGRAM_CHANNEL_ID=your_channel_id_here
+TELEGRAM_API_BASE_URL=https://api.telegram.org
+
+# MongoDB Settings
+MONGO_URI=mongodb://your_mongo_user:your_mongo_pass@your_mongo_host:27017/cloud
 ```
 
-2. Go to it and place `docker-compose.yml` file like this one:
+---
+
+## Installation & Deployment
+
+### 1. Running with Docker Compose (Recommended)
+
+You can run the pre-built Docker image using Docker Compose. Create a `docker-compose.yml` file:
 
 ```yaml
 version: "3.9"
 
-volumes:
-  cloud-db-volume:
-    name: cloud-db-volume
-
 services:
   cloud:
     container_name: cloud
-    image: manishdark/cloud
+    image: manishvashishtha/cloud:latest
+    ports:
+      - "8000:8000"
     env_file:
       - .env
-    ports:
-      - ${PORT}:8000
     restart: unless-stopped
-    depends_on:
-      - db
-
-  db:
-    container_name: cloud_db
-    image: postgres:15.0-alpine
-    environment:
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-    restart: unless-stopped
-    volumes:
-      - cloud-db-volume:/var/lib/postgresql/data
 ```
 
-And `.env` file like the next one. **Don't forget to set your superuser email, password and secret key**:
-
-```env
-PORT=8000
-WORKERS=4
-CHANNEL_CAPACITY=32
-SUPERUSER_EMAIL=<YOUR-EMAIL>
-SUPERUSER_PASS=<YOUR-PASSWORD>
-ACCESS_TOKEN_EXPIRE_IN_SECS=1800
-REFRESH_TOKEN_EXPIRE_IN_DAYS=14
-SECRET_KEY=<YOUR-SECRET-KEY>
-TELEGRAM_API_BASE_URL=https://api.telegram.org
-
-DATABASE_USER=cloud
-DATABASE_PASSWORD=cloud
-DATABASE_NAME=cloud
-DATABASE_HOST=db
-DATABASE_PORT=5432
-```
-
-Secret key can be set by your hand, but I strongly recommend to use long randomly generated sequences. So you either can generate it via some free websites that provide such funcionallity or by running something like this in the terminal:
-
-```sh
-openssl rand -hex 32
-```
-
-3. For now everything is set up so we can run our app:
+Create your `.env` file in the same directory and run:
 
 ```sh
 docker compose up -d
 ```
 
-To check if everything works fine you can go to http://localhost:8000 or to `http://<YOUR-PUBLIC-IP>:8000` if you run it on a server.
+Access the web interface at `http://localhost:8000`.
 
-If there are troubles, you can check the logs, there may be some errors:
+---
 
+### 2. Building from Source (Local Development)
+
+To run the frontend and backend services locally for development:
+
+#### Clone the Repository
 ```sh
-docker logs -f cloud
+git clone https://github.com/Manish-Dark/cloud.git
+cd cloud
 ```
 
-</details>
-
-<details>
-  <summary>Docker Compose from source</summary>
-
-Kind of simple way, but it's aimed to use it during development process
-
-1. Clone the repository and go inside the newly created directory:
-
-```sh
-git clone git@github.com:Manish-Dark/cloud.git
-```
-
-2. Copy `.env.example` to `.env`:
-
-```sh
-cp ./.env.example ./.env
-```
-
-and edit it like you wish.
-
-3. For now everything is set up so we can run our app:
-
-```sh
-make up
-```
-
-To check if everything works fine you can go to http://localhost:8000 or to `http://<YOUR-PUBLIC-IP>:8000` if you run it on a server.
-
-If there are troubles, you can check the logs, there may be some errors:
-
-```sh
-docker logs -f cloud
-```
-
-</details>
-
-<details>
-  <summary>Docker with pre-built image</summary>
-
-**TODO**
-
-</details>
-
-<details>
-  <summary>From source</summary>
-
-The most complex way to run the app.
-
-Requires the next stuff to be installed:
-
-- [Cargo](https://github.com/rust-lang/cargo)
-- [Node.js](https://nodejs.org/en)
-- [pnpm](https://pnpm.io/)
-- [Postgres](https://www.postgresql.org/)
-
-1. Create a directory to place all the app files wherever in your system:
-
-```sh
-mkdir ~/cloud
-```
-
-2. Clone the repository and go inside the newly created directory:
-
-```sh
-git clone git@github.com:Manish-Dark/cloud.git
-```
-
-3. Go to the `./cloud` directory and build server side app:
-
-```sh
-cd ./cloud
-cargo build --release
-```
-
-and copy the target to the app directory (or create a soft link via `ln -s`, does not matter):
-
-```sh
-cp ./target/release/cloud ~/cloud/cloud
-```
-
-4. Go to the `../ui` and build the UI side of the app:
-
-```sh
-cd ../ui
-pnpm run build
-```
-
-and copy built files into the app directory:
-
-```sh
-cp ./dist/* ~/cloud/ui/
-```
-
-5. Now go to the app directory:
-
-```sh
-cd ~/cloud
-```
-
-6. Make sure that you have Postgres database ran in your system (or available from network)
-7. Set all needed environment variables. You can check them in the [.env.example file](https://github.com/Manish-Dark/cloud/blob/main/.env.example). **Don't forget to set right Postgres credentials, host and port**:
-
-```sh
-export PORT=8000
-export WORKERS=4
-# ...
-```
-
-8. Finally run the app:
-
-```sh
-./cloud
-```
-
-To check if everything works fine you can go to http://localhost:8000 or to `http://<YOUR-PUBLIC-IP>:8000` if you run it on a server.
-
-</details>
-
-<br/>
-
-It's also recommended to use a HTTP reverse-proxy, like [Nginx](https://www.nginx.com/) or [Traefik](https://traefik.io/traefik/) if you use containarized version of the app and don't wanna work with Nginx and certbot.
-
-# Usage
-
-The platform is tied to the "storages" concept. Every storage is a separated files system, like different volumes on your drive. It provides funcionallity to work with a file system like it's Google Drive: you can create files and folders, download files, see files and folders info and delete them on your wish.
-
-In our case every storage has its own Telegram channel, where it will store all the data.
-
-The platform also uses "storage workers". It is telegram bots that are used to upload and download files from the telegram API
-
-## Telegram API limitations
-
-Telegram has its policy to limit some access to their platform. For us the main limitations are:
-
-- Requests per a period for one bot (RPM)
-- File size
-
-Cloud has ways to workaround them:
-
-### RPM
-
-To workaround RPM users can create additional storage workers. For now one user can create up to 20 bots. You can also create additional accounts to create extra bots or ask your nearest for example to do so. This way from up to Telegram limitations it becomes up to you on how fast you can upload/download in Cloud storage.
-
-I should notice that current RPM (20 requests per minute) is completely fine to work with a single storage worker if you need the storage to be your own and don't need to upload/download big files fast.
-
-### File size
-
-Currently Telegram API limits file download to 20 MB, hence we can't upload files more than that limit too.
-
-Cloud divides uploaded files into chunks and save them to Telegram separately and on downloading a file it fetches all the file chunks from the Telegram API and combine them into one in the order it was divided in. That grants ability to upload and download files with almost unlimited size (it's like you've ever downloaded a file with size >10 GB).
-
-## Current in storage features
-
-- [x] Upload file
-- [x] Download file
-- [x] Create folder
-- [x] Get file/folder info
-- [x] Delete file/folder
-
-## Access
-
-You can manage access to your storages by granting access to other users. For now, there are 3 possible roles:
-
-- Viewer
-- Can edit
-- Admin
-
-So you can grant access, change it or restrict (delete access) for other users.
-
-# Donations
-
-If you find this project useful and would like to see it continue to grow and improve, your support is greatly appreciated! Your donation will help cover the costs of development, maintenance, and future enhancements. Every contribution, no matter the size, makes a significant impact:
-
-**BTC**: `18mquj59AcB4y4VBevdn5HekG5y7gvPYGk`
-
-**TON**: `UQDoGRgUIEDA30cko8k-icnI8S5i8QIq2jFvqswNvVUc9F2U`
-
-**USDT TON**: `UQDoGRgUIEDA30cko8k-icnI8S5i8QIq2jFvqswNvVUc9F2U`
-
-# Future plans
-
-Cloud storage system has a huge variety of possible ways to develop in. Like it can be a file hosting service, a cloud object storage, a cloud drive or anything else or everything in one place. And I personally don't have idea right now where to move and what users need so I'd like to know what features you would like this app to provide.
-
-# Contributing
-
-Is highly welcoming! Create issues or take existing ones and create PRs!
-
+#### Set Up the Backend
+1. Go to the backend folder:
+   ```sh
+   cd backend
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Copy your `.env` configuration file to the root or load it in your environment.
+4. Run the backend in development mode:
+   ```sh
+   npm run dev
+   ```
+   The backend server runs on `http://localhost:8000`.
+
+#### Set Up the Frontend
+1. In a new terminal window, go to the frontend folder:
+   ```sh
+   cd frontend
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Start the Vite development server:
+   ```sh
+   npm run dev
+   ```
+   The frontend UI will be available at `http://localhost:5173`.
+
+---
+
+### 3. Production Build from Source
+
+To build a standalone production release where the Node backend hosts and serves the compiled React app static assets:
+
+1. Build the frontend:
+   ```sh
+   cd frontend
+   ```
+   ```sh
+   npm run build
+   ```
+   This will generate a production build in the `frontend/dist` directory.
+2. Build the backend:
+   ```sh
+   cd ../backend
+   ```
+   ```sh
+   npm run build
+   ```
+   This compiles the TypeScript files into Javascript under the `backend/dist` directory.
+3. Serve the application:
+   - Ensure the compiled frontend files are placed or served under `backend/public` (or copied as defined in your build pipeline).
+   - Start the backend:
+     ```sh
+     npm start
+     ```
+
+---
+
+## API Endpoints
+
+The backend exposes the following REST APIs:
+
+- **Authentication (`/api/auth`)**:
+  - `POST /api/auth/register` - Create a new user.
+  - `POST /api/auth/login` - Authenticate a user and receive a JWT.
+- **Users (`/api/users`)**: User profile and configuration.
+- **Files (`/api/files`)**:
+  - `GET /api/files?storage_id=xxx` - List files inside a virtual storage.
+  - `POST /api/files/init` - Initialize chunked file upload.
+  - `POST /api/files/:id/chunks` - Upload a specific chunk.
+  - `GET /api/files/:id/download` - Stream and download a reconstructed file.
+- **Folders (`/api/folders`)**: Create, list, rename, and delete folder structures.
+- **Storages (`/api/storages`)**: Manage multiple isolated storage volumes.
+- **Access Control (`/api/access`)**: Share storage accesses with other users (Viewer, Editor, Admin).
+- **Workers (`/api/workers`)**: Manage worker configurations to optimize and scale upload speeds.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please feel free to open issues or submit pull requests to improve functionality, add features, or update documentation.
+
+1. Fork the Repository.
+2. Create your Feature Branch (`git checkout -b feature/amazing-feature`).
+3. Commit your Changes (`git commit -m 'Add some amazing-feature'`).
+4. Push to the Branch (`git push origin feature/amazing-feature`).
+5. Open a Pull Request.
+
+---
+
+## License
+
+Distributed under the ISC License. See `LICENSE` for more information.
